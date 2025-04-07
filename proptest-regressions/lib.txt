@@ -1,8 +1,0 @@
-# Seeds for failure cases proptest has generated in the past. It is
-# automatically read and these particular cases re-run before any
-# novel cases are generated.
-#
-# It is recommended to check this file in to source control so that
-# everyone who runs the test benefits from these saved cases.
-cc f20be71fe233d0e65538a668aab7a9406456265810daa8c30b4ff83e771c0be1 # shrinks to starting_hash = [41, 156, 18, 217, 66, 67, 140, 167, 235, 97, 216, 104, 183, 112, 64, 67, 212, 0, 9, 105, 3, 149, 96, 46, 106, 143, 178, 247, 9, 235, 81, 115, 29, 100, 184, 58, 113, 165, 225, 6, 171, 100, 229, 255, 10, 52, 65, 132, 163, 55, 126, 36, 12, 223, 191, 194, 0, 215, 229, 75, 103, 48, 2, 81]
-cc 89c0a18e2367c38d7567a5ead6696b709467c45fe88dde1ed72686264e3774a0 # shrinks to starting_hash = [234, 78, 23, 217, 206, 199, 70, 113, 216, 222, 81, 124, 28, 25, 175, 130, 44, 126, 210, 152, 207, 174, 183, 69, 204, 208, 62, 187, 251, 126, 113, 120, 126, 209, 105, 7, 12, 184, 178, 249, 109, 187, 246, 158, 234, 187, 138, 81, 234, 200, 108, 190, 35, 171, 35, 109, 51, 81, 197, 86, 140, 134, 105, 131]

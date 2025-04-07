@@ -109,11 +109,14 @@ pub struct Storage {}
 
 #[public]
 impl Storage {
+    // We need to provide this function for the prover contract to check this
+    // contract's performance with this function.
     pub fn prove(&self, hash: FixedBytes<32>, from: u32) -> Result<(u32, u32), Vec<u8>> {
-        match solve(hash.as_slice(), from) {
-            Some(result) => Ok(result),
-            None => Err(vec![]),
-        }
+        Ok(solve(hash.as_slice(), from).unwrap())
+    }
+
+    pub fn test(&self) -> u32 {
+        return 1;
     }
 }
 
