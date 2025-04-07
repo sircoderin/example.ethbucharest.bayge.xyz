@@ -19,21 +19,18 @@ fn in_bounds(row_size: u32, x: u32, y: u32) -> bool {
     x < row_size && y < row_size
 }
 
-fn in_check_threats(board: &Board, row_size: u32, king_pos: u32) -> (Vec<u32>, HashMap<u32, u32>) {
-    let mut threats = vec![];
-    let mut map: HashMap<u32, u32> = HashMap::new();
+fn in_check_threats(board: &Board, row_size: u32, king_pos: u32) -> HashMap<u32, u32> {
+    let mut map: HashMap<u32, u32> = HashMap::with_capacity(CHECKS_NEEDED as usize * 2);
     for (nonce, piece, piece_pos) in board {
-        if map.contains_key(piece_pos) {
-            threats.retain(|&x| x != *map.get(piece_pos).unwrap());
-            map.remove(piece_pos);
-        }
-
         if is_checking(row_size, king_pos, *piece_pos, *piece) {
-            threats.push(*nonce);
             map.insert(*piece_pos, *nonce);
+        } else {
+            if map.contains_key(piece_pos) {
+                map.remove(piece_pos);
+            }
         }
     }
-    (threats, map)
+    map
 }
 
 fn is_checking(row_size: u32, king_pos: u32, piece_pos: u32, piece: Piece) -> bool {
@@ -58,11 +55,11 @@ fn is_checking(row_size: u32, king_pos: u32, piece_pos: u32, piece: Piece) -> bo
 }
 
 pub fn solve(starting_hash: &[u8], start: u32) -> Option<(u32, u32)> {
+    println!("Starting solve");
     let row_size = BOARD_SIZE.isqrt();
     let mut board: Board = Vec::new();
     let mut last_king: Option<(u32, u32)> = None;
-    let mut threats: Vec<u32> = vec![];
-    let mut map: HashMap<u32, u32> = HashMap::new();
+    let mut threat_map: HashMap<u32, u32> = HashMap::with_capacity(CHECKS_NEEDED as usize * 2);
 
     for i in start..MAX_TRIES {
         let e = prover::hash(starting_hash, i);
@@ -81,26 +78,24 @@ pub fn solve(starting_hash: &[u8], start: u32) -> Option<(u32, u32)> {
 
         if p == Piece::KING {
             last_king = Some((pos, i));
-            (threats, map) = in_check_threats(&board, row_size, pos);
+            threat_map = in_check_threats(&board, row_size, pos);
         } else if let Some((last_king_pos, _)) = last_king {
-            if map.contains_key(&pos) {
-                threats.retain(|&x| x != *map.get(&pos).unwrap());
-                map.remove(&pos);
-            }
-
             if is_checking(row_size, last_king_pos, pos, p) {
-                threats.push(i);
-                map.insert(pos, i);
+                threat_map.insert(pos, i);
+            } else if threat_map.contains_key(&pos) {
+                threat_map.remove(&pos);
             }
         }
 
         if let Some((_, last_king_nonce)) = last_king {
-            if threats.len() >= CHECKS_NEEDED as usize {
-                if !threats.contains(&last_king_nonce) {
-                    threats.push(last_king_nonce);
-                }
+            if threat_map.len() >= CHECKS_NEEDED as usize {
+                let min_threat = threat_map
+                    .values()
+                    .copied()
+                    .chain(std::iter::once(last_king_nonce))
+                    .min()
+                    .unwrap();
 
-                let min_threat = *threats.iter().min().unwrap();
                 return Some((min_threat, i));
             }
         }
